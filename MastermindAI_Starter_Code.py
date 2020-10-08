@@ -8,17 +8,29 @@
 def generate_all_codes():
     all_codes = set()
     
+    
     ## TODO: Use some sort of loop to generate all possible codes
+
+    for i in range(0, 6):
+        for a in range(0, 6):
+            for j in range(0, 6):
+                for c in range(0, 6):
+                    all_codes.add((i, a, j, c))
+            
+    
     
 
     ## This line will check if you are returning the correct number of codes.
     assert(len(all_codes) == 1296)
-    
     return all_codes
 
 ## Convert a tuple guess to a string
 def guess_to_string(guess):
     str_guess = ''
+
+    for d in guess:
+        str_guess += (str(d))
+            
 
     ## TODO: Convert a tuple guess to a string
     ## Ex, (0, 1, 2, 3)  ->  0123
@@ -72,20 +84,26 @@ class MastermindAI:
     ## TODO: Fill in the blanks and 
     def make_a_guess(self):
         ## If this is the first guess, guess 0011
-        if len(self.previous_guesses):
+        if len(self.previous_guesses)== 0:
+            self.previous_guesses.append((0,0,1,1))
             return (0,0,1,1)
+
+        if len(self.possible_codes) == 1:
+            return self.possible_codes.pop()
+
 
         ## If there is only 1 possible code, return it
         ## self.possible_codes is a set
         ## https://www.w3schools.com/python/python_ref_set.asp
 
         ## TODO: Code Here
+        
 
         ## Initialize some variables
         empty_response_count = dict()
         best_guess = (0,0,1,1)
         best_worst_response = len(self.possible_codes)
-
+        
         ## Set all possible responses to zero in empty_response_count
         ## Think about what responses are possible.
         ## Is it possible to have more correct_positions than correct_nums?
@@ -95,19 +113,24 @@ class MastermindAI:
         ## And so on
 
         ## TODO: Code Here
+        for i in range(0,5):
+            for j in range(0, i+1):
+                empty_response_count[(i, j)] = 0
+            
         
         
         for guess in self.all_codes:
             ## make a copy of empty_response_count
             ## https://www.w3schools.com/python/python_ref_dictionary.asp
             ## TODO: Blanks Here
-            response_count = _____
+            response_count = empty_response_count.copy()
 
             for code in self.possible_codes:
                 ## Simulate the response between guess and code
                 ## Increment (add 1) to the response count
                 
                 ## TODO: Code Here
+                response_count[simulate_response(guess, code)] += 1
 
             ## Apply minmax
             ## If the worst count in response_count (the largest count) is less than (better) our best_worst_response
@@ -116,9 +139,9 @@ class MastermindAI:
             ## https://www.w3schools.com/python/python_ref_dictionary.asp
             ## https://www.w3schools.com/python/ref_func_max.asp
             ## TODO: Blanks Here
-            if _____ < _____:
-                best_worst_response = _____
-                best_guess = _____
+            if max(response_count.values()) < best_worst_response:
+                best_worst_response = max(response_count.values())
+                best_guess = guess
                 
         return best_guess
 
@@ -139,11 +162,15 @@ class MastermindAI:
         ## https://www.w3schools.com/python/python_ref_set.asp
 
         ## TODO: Code Here
+        for code in self.possible_codes:
+            if simulate_response(guess, code) != response:
+                remove_set.add(code)
 
         ## Remove all codes in remove_set from self.possible_codes
         ## https://www.w3schools.com/python/python_ref_set.asp
 
         ## TODO: One Line of Code Here
+        self.possible_codes.difference_update(remove_set)
 
     ## Reset MastermindAI object to start a new game
     def reset(self):
@@ -158,21 +185,61 @@ if __name__ == "__main__":
     ## Do what ever you want, be creative
 
     ## Print Introduction and Instructions
+    print(" Hello I am BOT CORY.")
+    print(" Please think of a 4 digit number using only numbers from 0-5.")
+    print(" Remember, repitition IS allowed in the code")
 
-
-    ## Wait for human to think of code and press Enter
-
-
+    print(" \n\nPress Enter when you are ready")
+    input()
     ## Create an MastermindAI object
+    cory = MastermindAI()   
 
+    while len(cory.possible_codes) > 0:
+        guess = cory.make_a_guess()
+
+        if len(cory.possible_codes) == 1:
+            print(' I am pretty sure that the code is {0}'.format(guess_to_string(guess)))
+            print('This IS your code, right? (type yes/no)')
+            resp = input()
+            while resp != 'yes' or resp != 'no':
+                resp = input()
+
+            if resp == 'yes':
+                print(' Robots rule, humans drool. \nI think I found you code, buddy.')
+                print(' Better luck next time')
+                break
+
+            else:
+                print(' Thst can\'t be right. I have no flaws. ')
+                print(' ERROR: CORY DEACTIVATING.')
+                break
+
+        else:
+            print('My guess is {0}'.format(guess_to_string(guess)))
+
+        print(' How many numbers are correct?')
+        correct_num = int(input())
+        print('How many number are in the right position?')
+        correct_pos = int(input())
+
+        if correct_pos == 4:
+            print(' Robots rule, humans drool. \nI think I found you code, buddy.')
+            
+        
+        else:
+            print(' Okay thanks. Give me a moment for my next guess. ')
+            cory.update(guess, (correct_num, correct_pos))
+    
+       
+    
 
     ## Print out a guess
+    
 
 
     ## Ask how many numbers are correct. Read user input.
-
+    
 
     ## Ask how many positions are correct. Read user input.
-
 
     ## Repeat!
